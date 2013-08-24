@@ -19,8 +19,7 @@
 -(id)initWithCardCount:(NSUInteger)count
              usingDeck:(Deck*) deck;
 
--(void)flipCardAtIndex:(NSUInteger) index;
--(void)flipCardInThreeCardsModeAtIndex:(NSUInteger) index;
+-(void)flipCardAtIndex:(NSUInteger) index isTwoCardsMode: (BOOL) twoCardsMode;
 -(Card*)cardAtIndex:(NSUInteger)index;
 
 

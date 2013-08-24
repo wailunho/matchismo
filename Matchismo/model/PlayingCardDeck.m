@@ -9,7 +9,7 @@
 #import "PlayingCardDeck.h"
 @implementation PlayingCardDeck
 
-
+//initialize with 52 cards (a real deck)
 -(id)init
 {
     self = [super init];

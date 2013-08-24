@@ -26,96 +26,122 @@
 #define MATCH_BONUS 4
 #define MISMATCH_PENALTY 2
 #define FLIP_COST 1
-//2-cards mode
--(void)flipCardAtIndex:(NSUInteger) index
+-(void)flipCardAtIndex:(NSUInteger) index isTwoCardsMode: (BOOL) twoCardsMode
 {
     Card *card = [self cardAtIndex:index];
-    
-    if(card && !card.isUnplayable)
+    //2-cards mode game control.
+    if(twoCardsMode)
     {
-        if(!card.isFaceUp)
+        //check if card choosen and is playable
+        if(card && !card.isUnplayable)
         {
-            for(Card *otherCard in self.cards)
+            //check if card is not facing up right before we flip it
+            if(!card.isFaceUp)
             {
-                if(otherCard.isFaceUp && !otherCard.isUnplayable)
+                //at this point, we have flip a card.
+                //find another card that is already facing up to do the matching
+                for(Card *otherCard in self.cards)
                 {
-                    int matchScore = [card match:@[otherCard]];
-                    if (matchScore)
+                    //the card we are finding needs to be facing up and is playable.
+                    if(otherCard.isFaceUp && !otherCard.isUnplayable)
                     {
-                        card.unplayable = YES;
-                        otherCard.unplayable = YES;
-                        self.score += matchScore * MATCH_BONUS;
-                        self.lastFlipResultString = [NSString stringWithFormat:@"Matched %@ and %@ for %d points!", card.contents, otherCard.contents, matchScore * MATCH_BONUS];
+                        //match the card we just flip with the card we found that is already facing up
+                        int matchScore = [card match:@[otherCard]];
+                        //they are matched.
+                        if (matchScore)
+                        {
+                            card.unplayable = YES;
+                            otherCard.unplayable = YES;
+                            self.score += matchScore * MATCH_BONUS;
+                            self.lastFlipResultString = [NSString stringWithFormat:@"Matched %@ and %@ for %d points!", card.contents, otherCard.contents, matchScore * MATCH_BONUS];
+                        }
+                        //they are not matched
+                        else
+                        {
+                            otherCard.faceUp = NO;
+                            self.score -= MISMATCH_PENALTY;
+                            self.lastFlipResultString = [NSString stringWithFormat:@"%@ and %@ don't match! 2 points penality!", card.contents, otherCard.contents];
+                        }
+                        break;
                     }
+                    //no other facing up card is found, we display a message to playing indicate which card has flipped
                     else
-                    {
-                        otherCard.faceUp = NO;
-                        self.score -= MISMATCH_PENALTY;
-                        self.lastFlipResultString = [NSString stringWithFormat:@"%@ and %@ don't match! 2 points penality!", card.contents, otherCard.contents];
-                    }
-                    break;
+                        self.lastFlipResultString = [NSString stringWithFormat:@"Flipped up %@", card.contents];
                 }
-                else
+                //penality for each flip. Only when flipping it to face up.
+                self.score -= FLIP_COST;
+            }
+            //flip the face. 
+            card.faceUp = !card.isFaceUp;
+        }
+    }
+    //3-cards mode game control
+    //similar to 2-cards mode with a little adjustment
+    else
+    {
+        //check if card choosen and is playable
+        if(card && !card.isUnplayable)
+        {
+            //check if card is not facing up right before we flip it
+            if(!card.isFaceUp)
+            {
+                //at this point, we have flip a card.
+                //set the lastFlipResultString to nil so we can check if it has change during
+                //matches, and if it is not, we can assign a message to it only when we are not
+                //doing the matches. In other words, this is the first or the second card facing up.
+                self.lastFlipResultString = nil;
+                
+                //find another card(second card) that is already facing up to do the matching
+                for(Card *secondCard in self.cards)
+                {
+                    if(secondCard.isFaceUp && !secondCard.isUnplayable)
+                    {
+                        //second card is facing up, we need to once again find another card that is facing up.
+                        for(Card *thirdCard in self.cards)
+                        {
+                            
+                            if(thirdCard != secondCard && thirdCard.isFaceUp && !thirdCard.isUnplayable)
+                            {
+                                //three cards are facing up
+                                //match these three card.
+                                int matchScore = [card match:@[secondCard, thirdCard]];
+                                //they are matched
+                                if (matchScore)
+                                {
+                                    card.unplayable = YES;
+                                    secondCard.unplayable = YES;
+                                    thirdCard.unplayable = YES;
+                                    self.score += matchScore * MATCH_BONUS;
+                                    self.lastFlipResultString = [NSString stringWithFormat:@"Matched %@, %@ and %@ for %d points!", card.contents, secondCard.contents, thirdCard.contents, matchScore * MATCH_BONUS];
+                                }
+                                //not matched
+                                else
+                                {
+                                    secondCard.faceUp = NO;
+                                    thirdCard.faceUp = NO;
+                                    self.score -= MISMATCH_PENALTY;
+                                    self.lastFlipResultString = [NSString stringWithFormat:@"%@, %@ and %@ don't match! 2 points penality!", card.contents, secondCard.contents, thirdCard.contents];
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
+                //penality for each flip. Only when flipping it to face up.
+                self.score -= FLIP_COST;
+                //if we try to match, lastFlipResultString should have something in it. If not,
+                //we assign a message to tell the playing which card he or she flipped.
+                if(!self.lastFlipResultString)
                     self.lastFlipResultString = [NSString stringWithFormat:@"Flipped up %@", card.contents];
             }
-            self.score -= FLIP_COST;
+            card.faceUp = !card.isFaceUp;
         }
-        card.faceUp = !card.isFaceUp;
-    }
-}
-
-//3-cards mode
--(void)flipCardInThreeCardsModeAtIndex:(NSUInteger) index
-{
-    Card *card = [self cardAtIndex:index];
-    
-    if(card && !card.isUnplayable)
-    {
-        if(!card.isFaceUp)
-        {
-            //One card is facing up
-            for(Card *secondCard in self.cards)
-            {
-                if(secondCard.isFaceUp && !secondCard.isUnplayable)
-                {
-                    //two cards are facing up
-                    for(Card *thirdCard in self.cards)
-                    {
-                        
-                        if(thirdCard != secondCard && thirdCard.isFaceUp && !thirdCard.isUnplayable)
-                        {
-                            //three cards are facing up
-                            int matchScore = [card match:@[secondCard, thirdCard]];
-                            if (matchScore)
-                            {
-                                card.unplayable = YES;
-                                secondCard.unplayable = YES;
-                                thirdCard.unplayable = YES;
-                                self.score += matchScore * MATCH_BONUS;
-                                self.lastFlipResultString = [NSString stringWithFormat:@"Matched %@, %@ and %@ for %d points!", card.contents, secondCard.contents, thirdCard.contents, matchScore * MATCH_BONUS];
-                            }
-                            else
-                            {
-                                secondCard.faceUp = NO;
-                                thirdCard.faceUp = NO;
-                                self.score -= MISMATCH_PENALTY;
-                                self.lastFlipResultString = [NSString stringWithFormat:@"%@, %@ and %@ don't match! 2 points penality!", card.contents, secondCard.contents, thirdCard.contents];
-                            }
-                            break;
-                        }
-                        else
-                            self.lastFlipResultString = [NSString stringWithFormat:@"Flipped up %@", card.contents];
-                    }
-                }
-            }
-            self.score -= FLIP_COST;
-        }
-        card.faceUp = !card.isFaceUp;
     }
 }
 
 -(Card*)cardAtIndex:(NSUInteger)index
 {
+    //return the card in index.
     return (index < [self.cards count]) ? self.cards[index] : nil;
 }
 

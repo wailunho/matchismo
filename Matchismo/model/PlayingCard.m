@@ -52,6 +52,9 @@
     }
 }
 
+
+//overriding the method matches in Card.h
+//matches either 2 cards or 3 cards
 -(int)match:(NSArray *)otherCards
 {
     int score = 0;

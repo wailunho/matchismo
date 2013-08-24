@@ -60,6 +60,8 @@
     }
     self.scoreLabel.text = [NSString stringWithFormat:@"Score: %d", self.game.score];
     self.lastFlipLable.text = self.game.lastFlipResultString;
+    
+    //disable the segment when the game is already started.
     if(self.flipCount == 0)
         self.levelSelectSegment.enabled = YES;
     else
@@ -76,10 +78,11 @@
 
 - (IBAction)flipCard:(UIButton *)sender
 {
+    //depending on the segment selection, it calls the method in either two-card mode or three-card mode.
     if([self.levelSelectSegment selectedSegmentIndex] == 0)
-        [self.game flipCardAtIndex:[self.cardButtons indexOfObject:sender]];
+        [self.game flipCardAtIndex:[self.cardButtons indexOfObject:sender] isTwoCardsMode:YES];
     else
-        [self.game flipCardInThreeCardsModeAtIndex:[self.cardButtons indexOfObject:sender]];
+        [self.game flipCardAtIndex:[self.cardButtons indexOfObject:sender] isTwoCardsMode:NO];
     self.flipCount++;
     [self updateUI];
 }
