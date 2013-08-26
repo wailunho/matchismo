@@ -16,16 +16,17 @@
 
 @implementation CardMatchingGame
 
+//socre multplier for card matching game
+#define MATCH_BONUS 4
+#define MISMATCH_PENALTY 2
+#define FLIP_COST 1
+
 -(NSMutableArray*)cards
 {
     if(!_cards)_cards = [[NSMutableArray alloc] init];
     return _cards;
 }
 
-//socre multplier
-#define MATCH_BONUS 4
-#define MISMATCH_PENALTY 2
-#define FLIP_COST 1
 -(void)flipCardAtIndex:(NSUInteger) index isTwoCardsMode: (BOOL) twoCardsMode
 {
     Card *card = [self cardAtIndex:index];
@@ -45,7 +46,7 @@
                     //the card we are finding needs to be facing up and is playable.
                     if(otherCard.isFaceUp && !otherCard.isUnplayable)
                     {
-                        //match the card we just flip with the card we found that is already facing up
+                        //match the card we just flipped with the card we found that is already facing up
                         int matchScore = [card match:@[otherCard]];
                         //they are matched.
                         if (matchScore)
@@ -64,7 +65,7 @@
                         }
                         break;
                     }
-                    //no other facing up card is found, we display a message to playing indicate which card has flipped
+                    //no other facing up card is found, we display a message to player indicate which card has flipped
                     else
                         self.lastFlipResultString = [NSString stringWithFormat:@"Flipped up %@", card.contents];
                 }

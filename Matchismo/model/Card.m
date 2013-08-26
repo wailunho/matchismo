@@ -10,38 +10,15 @@
 
 @implementation Card
 
-@synthesize contents = _contents;
-@synthesize faceUp = _faceUp;
-@synthesize unplayable = _unplayable;
-
--(NSString*)contents
-{
-    return _contents;
-}
-
--(void)setContents:(NSString *)contents
-{
-    _contents = contents;
-}
-
 -(BOOL)isFaceUp
 {
     return _faceUp;
 }
--(void)setFaceUp:(BOOL)faceUp
-{
-    _faceUp = faceUp;
-}
+
 -(BOOL)isUnplayable
 {
     return _unplayable;
 }
-
--(void)setUnplayable:(BOOL)unplayable
-{
-    _unplayable = unplayable;
-}
-
 
 -(int)match:(NSArray *)otherCards
 {
