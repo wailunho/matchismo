@@ -394,6 +394,9 @@
                                 <state key="highlighted">
                                     <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
+                                <connections>
+                                    <action selector="restartGame:" destination="bHC-Mt-SzY" eventType="touchUpInside" id="wC6-Nm-2SY"/>
+                                </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="apI-ss-Tnf">
                                 <rect key="frame" x="20" y="20" width="59" height="41"/>

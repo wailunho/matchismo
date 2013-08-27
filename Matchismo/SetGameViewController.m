@@ -30,6 +30,12 @@
     }
     return self;
 }
+- (IBAction)restartGame:(id)sender
+{
+    self.flipCount = 0;
+    self.game = nil;
+    [self updateUI];
+}
 
 -(void)setCardButtons:(NSArray *)cardButtons
 {
@@ -52,7 +58,7 @@
         [cardButton setAttributedTitle: card.attributedContents forState:UIControlStateNormal];
         cardButton.enabled = !card.isUnplayable;
         cardButton.selected = card.isSelected;
-        cardButton.alpha = (card.isUnplayable)? 0.4 : 1.0;
+        cardButton.alpha = (card.isUnplayable)? 0.1 : 1.0;
         if(card.isSelected)
             cardButton.backgroundColor = [UIColor yellowColor];
         else

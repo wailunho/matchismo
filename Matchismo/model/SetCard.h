@@ -11,6 +11,7 @@
 @interface SetCard : Card
 
 @property(strong, nonatomic) NSString *suit;
+@property(nonatomic) int numOfSuit;
 @property(strong, nonatomic) UIColor *color;
 @property(strong, nonatomic) NSNumber *shading;
 @property (strong, nonatomic) NSAttributedString *attributedContents;
@@ -19,5 +20,6 @@
 +(NSArray*)validSuits;
 +(NSArray*)validColors;
 +(NSArray*)validShadings;
++(int)maxNumOfSuits;
 
 @end
