@@ -19,7 +19,7 @@
     return _cards;
 }
 
--(void)addCards:(Card*)card atTop:(BOOL)atTop
+-(void)addCards:(id)card atTop:(BOOL)atTop
 {
     if(atTop)
     {
@@ -31,7 +31,7 @@
     }
 }
 
--(Card*)drawRandomCard
+-(id)drawRandomCard
 {
     id randomCard = nil;
     

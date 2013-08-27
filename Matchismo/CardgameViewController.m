@@ -18,9 +18,8 @@
 @property (strong, nonatomic) CardMatchingGame *game;
 @property (weak, nonatomic) IBOutlet UILabel *scoreLabel;
 @property (weak, nonatomic) IBOutlet UILabel *lastFlipLable;
-@property (weak, nonatomic) IBOutlet UISegmentedControl *levelSelectSegment;
-@property (weak, nonatomic) IBOutlet UISlider *flipHistroySlider;
-@property (strong, nonatomic) NSMutableArray *flipHistroy;
+@property (weak, nonatomic) IBOutlet UISlider *flipHistorySlider;
+@property (strong, nonatomic) NSMutableArray *flipHistory;
 
 @end
 
@@ -35,18 +34,20 @@
     return self;
 }
 
--(NSMutableArray*)flipHistroy
+-(NSMutableArray*)flipHistory
 {
-    if(!_flipHistroy)_flipHistroy = [[NSMutableArray alloc] init];
-    return _flipHistroy;
+    if(!_flipHistory)_flipHistory = [[NSMutableArray alloc] init];
+    return _flipHistory;
 }
 
 
 - (IBAction)restartGame:(id)sender {
     self.game = nil;
-    self.flipHistroy = nil;
+    self.flipHistory = nil;
     self.flipCount = 0;
     self.lastFlipLable.text = @"";
+    self.flipHistorySlider.value = 0;
+    self.flipHistorySlider.maximumValue = 0;
     [self updateUI];
 }
 
@@ -63,13 +64,6 @@
     [self updateUI];
 }
 
--(void)setLevelSelectSegment:(UISegmentedControl *)levelSelectSegment
-{
-    [levelSelectSegment setFrame:CGRectMake(29, 346, 268, 20)];
-    
-    _levelSelectSegment = levelSelectSegment;
-    [self updateUI];
-}
 - (IBAction)browserFlipHistory:(id)sender
 {
     [self updateUI];
@@ -77,6 +71,7 @@
 
 -(void) updateUI
 {
+    //setting for all the card buttons
     for(UIButton *carButton in self.cardButtons)
     {
         Card * card = [self.game cardAtIndex:[self.cardButtons indexOfObject:carButton]];
@@ -89,23 +84,20 @@
         carButton.selected = card.isFaceUp;
         carButton.enabled = !card.isUnplayable;
     }
+    
+    //display the game score
     self.scoreLabel.text = [NSString stringWithFormat:@"Score: %d", self.game.score];
     
-    //disable the segment when the game is already started.
-    if(self.flipCount == 0)
-        self.levelSelectSegment.enabled = YES;
-    else
-        self.levelSelectSegment.enabled = NO;
-    
-    //add last flip description into history
+    //display the flip history indicated by the slider
     if(self.flipCount > 0)
-        self.lastFlipLable.text = self.flipHistroy[[self historyIndex]];
+        self.lastFlipLable.text = [NSString stringWithFormat:@"%d: %@", [self historyIndex] + 1,self.flipHistory[[self historyIndex]]];
     
 }
 
+//Use this to get the value in the slider in int, that is rounded off.
 -(int) historyIndex
 {
-    return (int)roundf(self.flipHistroySlider.value);
+    return (int)roundf(self.flipHistorySlider.value);
 }
 
 
@@ -117,19 +109,21 @@
 
 - (IBAction)flipCard:(UIButton *)sender
 {
-    //depending on the segment selection, it calls the method in either two-card mode or three-card mode.
-    if([self.levelSelectSegment selectedSegmentIndex] == 0)
-        [self.game flipCardAtIndex:[self.cardButtons indexOfObject:sender] isTwoCardsMode:YES];
-    else
-        [self.game flipCardAtIndex:[self.cardButtons indexOfObject:sender] isTwoCardsMode:NO];
+    //flip a card
+    [self.game flipCardAtIndex:[self.cardButtons indexOfObject:sender]];
+    
+    //change text on flip count label
     self.flipCount++;
     
+    //add the new flip into the flip history
     if(self.game.lastFlipResultString)
     {
-        [self.flipHistroy addObject:self.game.lastFlipResultString];
-        self.flipHistroySlider.maximumValue = self.flipCount - 1;
+        [self.flipHistory addObject:self.game.lastFlipResultString];
+        self.flipHistorySlider.maximumValue = self.flipCount - 1;
     }
-    self.flipHistroySlider.value = self.flipHistroy.count - 1;
+    
+    //put the slider to reflect the most recent flip in the flip history
+    self.flipHistorySlider.value = self.flipHistory.count - 1;
     [self updateUI];
 }
 

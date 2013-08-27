@@ -13,6 +13,6 @@
 
 @property(strong, nonatomic) NSMutableArray *cards;
 
--(void)addCards:(Card*) card atTop:(BOOL)atTop;
--(Card*)drawRandomCard;
+-(void)addCards:(id) card atTop:(BOOL)atTop;
+-(id)drawRandomCard;
 @end

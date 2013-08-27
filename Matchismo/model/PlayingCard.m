@@ -78,6 +78,7 @@
             }
         }
     }
+    /*
     //3-cards mode
     //Similar to 2-cards mode but it compares the suit and rank among all three cards
     else if([otherCards count] == 2)
@@ -99,6 +100,7 @@
 
         }
     }
+     */
     return score;
 }
 @end

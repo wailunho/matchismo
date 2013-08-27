@@ -8,8 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@class Deck;
-
 @interface CardgameViewController : UIViewController
 
 @end
