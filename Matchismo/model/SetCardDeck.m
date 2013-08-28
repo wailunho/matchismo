@@ -18,7 +18,7 @@
     {
         for(NSString *suit in [SetCard validSuits]){
             for(int i = 1; i <= [SetCard maxNumOfSuits]; i++){
-                for(UIColor *color in [SetCard validColors]){
+                for(NSString *color in [SetCard validColors]){
                     for(NSNumber *shading in [SetCard validShadings]){
                         SetCard * card  = [[SetCard alloc] init];
                         card.suit = suit;

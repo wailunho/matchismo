@@ -12,9 +12,9 @@
 
 @property(strong, nonatomic) NSString *suit;
 @property(nonatomic) int numOfSuit;
-@property(strong, nonatomic) UIColor *color;
+@property(strong, nonatomic) NSString *color;
 @property(strong, nonatomic) NSNumber *shading;
-@property (strong, nonatomic) NSAttributedString *attributedContents;
+@property (strong, nonatomic) NSString *contents;
 @property (nonatomic) BOOL isSelected;
 
 +(NSArray*)validSuits;

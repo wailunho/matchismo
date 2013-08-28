@@ -13,7 +13,7 @@
 @interface CardSetGame()
 @property (strong, nonatomic) NSMutableArray *cards;
 @property (readwrite, nonatomic) int score;
-@property (readwrite, nonatomic, strong) NSMutableAttributedString *lastFlipResultString;
+@property (readwrite, nonatomic, strong) NSString *lastFlipResultString;
 @end
 
 @implementation CardSetGame
@@ -28,14 +28,6 @@
     if(!_cards)_cards = [[NSMutableArray alloc] init];
     return _cards;
 }
-
--(NSMutableAttributedString*)lastFlipResultString
-{
-    if(!_lastFlipResultString)_lastFlipResultString = [[NSMutableAttributedString alloc] init];
-    return _lastFlipResultString;
-}
-
-
 
 -(void)flipCardAtIndex:(NSUInteger) index
 {
@@ -74,7 +66,7 @@
                                 secondCard.unplayable = YES;
                                 thirdCard.unplayable = YES;
                                 self.score += matchScore * MATCH_BONUS;
-                                self.lastFlipResultString = [NSString stringWithFormat:@"Matched %@, %@ and %@ for %d points!", card.attributedContents, secondCard.attributedContents, thirdCard.attributedContents, matchScore * MATCH_BONUS];
+                                self.lastFlipResultString = [NSString stringWithFormat:@"Matched %@, %@ and %@ for %d points!", card.contents, secondCard.contents, thirdCard.contents, matchScore * MATCH_BONUS];
                             }
                             //not matched
                             else
@@ -83,7 +75,7 @@
                                 secondCard.isSelected = NO;
                                 thirdCard.isSelected = NO;
                                 self.score -= MISMATCH_PENALTY;
-                                self.lastFlipResultString = [NSString stringWithFormat:@"%@, %@ and %@ don't match! 2 points penality!", card.attributedContents, secondCard.attributedContents, thirdCard.attributedContents];
+                                self.lastFlipResultString = [NSString stringWithFormat:@"%@, %@ and %@ don't match! 4 points penality!", card.contents, secondCard.contents, thirdCard.contents];
                             }
                             break;
                         }
@@ -95,10 +87,10 @@
             //if we try to match, lastFlipResultString should have something in it. If not,
             //we assign a message to tell the playing which card he or she flipped.
             if(!self.lastFlipResultString)
-                self.lastFlipResultString = [NSString stringWithFormat:@"Selected %@", card.attributedContents];
+                self.lastFlipResultString = [NSString stringWithFormat:@"Selected %@", card.contents];
         }
         else
-            self.lastFlipResultString = [NSString stringWithFormat:@"Unselected %@", card.attributedContents];
+            self.lastFlipResultString = [NSString stringWithFormat:@"Unselected %@", card.contents];
         card.isSelected = !card.isSelected;
     }
 

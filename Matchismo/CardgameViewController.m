@@ -17,7 +17,7 @@
 @property (nonatomic) int flipCount;
 @property (strong, nonatomic) CardMatchingGame *game;
 @property (weak, nonatomic) IBOutlet UILabel *scoreLabel;
-@property (weak, nonatomic) IBOutlet UILabel *lastFlipLable;
+@property (weak, nonatomic) IBOutlet UILabel *lastFlipLabel;
 @property (weak, nonatomic) IBOutlet UISlider *flipHistorySlider;
 @property (strong, nonatomic) NSMutableArray *flipHistory;
 
@@ -45,7 +45,7 @@
     self.game = nil;
     self.flipHistory = nil;
     self.flipCount = 0;
-    self.lastFlipLable.text = @"";
+    self.lastFlipLabel.text = @"";
     self.flipHistorySlider.value = 0;
     self.flipHistorySlider.maximumValue = 0;
     [self updateUI];
@@ -90,7 +90,7 @@
     
     //display the flip history indicated by the slider
     if(self.flipCount > 0)
-        self.lastFlipLable.text = [NSString stringWithFormat:@"%d: %@", [self historyIndex] + 1,self.flipHistory[[self historyIndex]]];
+        self.lastFlipLabel.text = [NSString stringWithFormat:@"%d: %@", [self historyIndex] + 1,self.flipHistory[[self historyIndex]]];
     
 }
 

@@ -34,7 +34,7 @@
     }
 }
 
--(void) setColor:(UIColor *)color
+-(void) setColor:(NSString *)color
 {
     if([[SetCard validColors] containsObject:color])
     {
@@ -62,7 +62,7 @@
 
 +(NSArray*)validColors
 {
-    return @[[UIColor redColor], [UIColor greenColor], [UIColor blueColor]];
+    return @[@"redColor", @"greenColor", @"blueColor"];
 }
 
 +(NSArray*)validShadings
@@ -70,19 +70,14 @@
     return @[@0.0, @0.2, @1.0];
 }
 
--(NSAttributedString *)attributedContents
+-(NSString *)contents
 {
     NSMutableString *cardMutableString = [[NSMutableString alloc] initWithString:@" "];
     for(int i = 1; i <= self.numOfSuit; i++)
         [cardMutableString appendString:[NSString stringWithFormat:@"%@ ", self.suit]];
     
     NSString *cardString = [cardMutableString copy];
-    NSMutableAttributedString *cardMutableAttributedString = [[NSMutableAttributedString alloc] initWithString: cardString];
-    NSDictionary *attributes = @{NSStrokeColorAttributeName: self.color, NSForegroundColorAttributeName: [self.color colorWithAlphaComponent:[self.shading floatValue]], NSStrokeWidthAttributeName: @-5};
-    [cardMutableAttributedString setAttributes:attributes range:NSMakeRange(0, [cardString length])];
-    
-    NSAttributedString *cardAttributedString = [cardMutableAttributedString mutableCopy];
-    return cardAttributedString;
+    return cardString;
 }
 
 -(int)match:(NSArray *)otherCards
@@ -157,56 +152,48 @@
                     //Three cards have the same suit.
                     if([secondSetCard.suit isEqualToString:self.suit] && [thirdSetCard.suit isEqualToString:self.suit])
                         isMatch = YES;
-                    NSLog(@"%@\n%@\n%@", self.suit, secondSetCard.suit, thirdSetCard.suit);
                     break;
                     
                 case SetTypeNumOfSuit:
                     //Three cards have the same number of suit.
                     if(secondSetCard.numOfSuit == self.numOfSuit && thirdSetCard.numOfSuit == self.numOfSuit)
                         isMatch = YES;
-                    NSLog(@"%d\n%d\n%d", self.numOfSuit, secondSetCard.numOfSuit, thirdSetCard.numOfSuit);
                     break;
                     
                 case SetTypeColor:
                     //Three cards have the same color.
-                    if([secondSetCard.color isEqual:self.color] && [thirdSetCard.color isEqual:self.color])
+                    if([secondSetCard.color isEqualToString:self.color] && [thirdSetCard.color isEqualToString:self.color])
                         isMatch = YES;
-                    NSLog(@"%@\n%@\n%@", self.color, secondSetCard.color, thirdSetCard.color);
                     break;
                     
                 case SetTypeShading:
                     //Three cards have the same shading.
                     if([secondSetCard.shading isEqualToNumber: self.shading] && [thirdSetCard.shading isEqualToNumber: self.shading])
                         isMatch = YES;
-                    NSLog(@"%@\n%@\n%@", self.shading, secondSetCard.shading, thirdSetCard.shading);
                     break;
                     
                 case SetTypeDifferentSuit:
                     //Three cards have different suits.
                     if(![secondSetCard.suit isEqualToString:self.suit] && ![thirdSetCard.suit isEqualToString:self.suit] && ![secondSetCard.suit isEqualToString:thirdSetCard.suit])
                         isMatch = YES;
-                    NSLog(@"differentsuit%@\n%@\n%@", self.suit, secondSetCard.suit, thirdSetCard.suit);
                     break;
                     
                 case SetTypeDifferentNumOfSuit:
                     //Three cards have different number of suit.
                     if(secondSetCard.numOfSuit != self.numOfSuit && thirdSetCard.numOfSuit != self.numOfSuit && secondSetCard.numOfSuit != thirdSetCard.numOfSuit)
                         isMatch = YES;
-                    NSLog(@"%d\n%d\n%d", self.numOfSuit, secondSetCard.numOfSuit, thirdSetCard.numOfSuit);
                     break;
                     
                 case SetTypeDifferentColor:
                     //Three cards have different colors.
-                    if(![secondSetCard.color isEqual:self.color] && ![thirdSetCard.color isEqual:self.color] && ![secondSetCard.color isEqual:thirdSetCard.color])
+                    if(![secondSetCard.color isEqualToString:self.color] && ![thirdSetCard.color isEqualToString:self.color] && ![secondSetCard.color isEqualToString:thirdSetCard.color])
                         isMatch = YES;
-                    NSLog(@"differentcolor%@\n%@\n%@", self.color, secondSetCard.color, thirdSetCard.color);
                     break;
                     
                 case SetTypeDifferentShading:
                     //Three cards have different shadings.
                     if(![secondSetCard.shading isEqualToNumber: self.shading] && ![thirdSetCard.shading isEqualToNumber: self.shading] && ![secondSetCard.shading isEqualToNumber: thirdSetCard.shading])
                         isMatch = YES;
-                    NSLog(@"differentshading%@\n%@\n%@", self.shading, secondSetCard.shading, thirdSetCard.shading);
                     break;
                     
                 default:
