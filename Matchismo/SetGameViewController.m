@@ -76,18 +76,12 @@
 
 -(void) updateUI
 {
-    NSDictionary *colorDictionary = @{@"redColor":[UIColor redColor], @"greenColor": [UIColor greenColor], @"blueColor": [UIColor blueColor]};
-    
     //setting for all the card buttons
     for(UIButton *cardButton in self.cardButtons)
     {
         SetCard * card = [self.game cardAtIndex:[self.cardButtons indexOfObject:cardButton]];
-        
-         NSMutableAttributedString *cardMutableAttributedString = [[NSMutableAttributedString alloc] initWithString: card.contents];
-         NSDictionary *attributes = @{NSStrokeColorAttributeName: colorDictionary[card.color], NSForegroundColorAttributeName: [colorDictionary[card.color] colorWithAlphaComponent:[card.shading floatValue]], NSStrokeWidthAttributeName: @-5};
-         [cardMutableAttributedString setAttributes:attributes range:NSMakeRange(0, [card.contents length])];
-        
-         NSAttributedString *cardAttributedString = [cardMutableAttributedString mutableCopy];
+
+        NSAttributedString *cardAttributedString = [self contentToAttributedString:card];
         [cardButton setAttributedTitle: cardAttributedString forState:UIControlStateNormal];
         
         cardButton.enabled = !card.isUnplayable;
@@ -104,8 +98,11 @@
     
     //display the flip history indicated by the slider
     if(self.flipCount > 0)
-        self.lastFlipLabel.text = [NSString stringWithFormat:@"%d: %@", [self historyIndex] + 1,self.flipHistory[[self historyIndex]]];
-
+    {
+        NSMutableAttributedString *temp = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%d: ", [self historyIndex] + 1]];
+        [temp appendAttributedString:self.flipHistory[[self historyIndex]]];
+        self.lastFlipLabel.attributedText = temp;
+    }
 }
 
 //Use this to get the value in the slider in int, that is rounded off.
@@ -121,6 +118,23 @@
     return _game;
 }
 
+-(NSAttributedString*)contentToAttributedString:(SetCard*)card
+{
+    NSDictionary *colorDictionary = @{@"redColor":[UIColor redColor], @"greenColor": [UIColor greenColor], @"blueColor": [UIColor blueColor]};
+    
+    NSDictionary *attributes = @{NSStrokeColorAttributeName: colorDictionary[card.color], NSForegroundColorAttributeName: [colorDictionary[card.color] colorWithAlphaComponent:[card.shading floatValue]], NSStrokeWidthAttributeName: @-5};
+    
+    NSAttributedString *attributedString = [[NSAttributedString alloc] initWithString:card.contents attributes:attributes];
+    return attributedString;
+}
+
+-(NSMutableAttributedString*) replaceWordInString:(NSMutableAttributedString*) attributedString withWord: (NSAttributedString*) word
+{
+    NSRange range = [[attributedString string] rangeOfString: [word string]];
+    [attributedString replaceCharactersInRange:range withAttributedString:word];
+    return attributedString;
+}
+
 - (IBAction)selectCard:(id)sender
 {
     //select a card
@@ -130,9 +144,40 @@
     self.flipCount++;
     
     //add the new flip into the flip history
-    if(self.game.lastFlipResultString)
+    if(self.game.lastFlipResultDictionary)
     {
-        [self.flipHistory addObject:self.game.lastFlipResultString];
+        NSMutableAttributedString *historyAttributedString = [[NSMutableAttributedString alloc] init];
+        
+        SetCard *firstCard = self.game.lastFlipResultDictionary[@"firstCard"];
+        NSMutableArray *replacingWords = [[NSMutableArray alloc] initWithObjects:[self contentToAttributedString:firstCard], nil];
+        NSMutableArray *wordsNeedToReplace = [[NSMutableArray alloc] initWithObjects:firstCard.contents, nil];
+        if(self.game.lastFlipResultDictionary.count == 4)
+        {
+            SetCard *secondCard = self.game.lastFlipResultDictionary[@"secondCard"];
+            SetCard *thirdCard = self.game.lastFlipResultDictionary[@"thirdCard"];
+            [wordsNeedToReplace addObjectsFromArray:@[secondCard.contents, thirdCard.contents]];
+            [replacingWords addObjectsFromArray:@[[self contentToAttributedString:secondCard], [self contentToAttributedString:thirdCard]]];
+        }
+        
+        NSArray *stringArray = [self.game.lastFlipResultDictionary[@"string"] componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        for(NSString* word in stringArray)
+        {
+            for(int i = 0; i <= [wordsNeedToReplace count]; i++)
+            {
+                if(i == [wordsNeedToReplace count])
+                    [historyAttributedString appendAttributedString:[[NSAttributedString alloc] initWithString:[word stringByAppendingString:@" "]]];
+                else if([wordsNeedToReplace[i] isEqualToString:word])
+                {
+                    [historyAttributedString appendAttributedString:replacingWords[i]];
+                    [historyAttributedString appendAttributedString:[[NSAttributedString alloc] initWithString:@" "]];
+                    wordsNeedToReplace[i] = @"";
+                    break;
+                }
+            }
+        }
+        
+        
+        [self.flipHistory addObject:historyAttributedString];
         self.flipHistorySlider.maximumValue = self.flipCount - 1;
     }
     

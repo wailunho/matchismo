@@ -17,6 +17,8 @@
 #define SetTypeDifferentColor 7
 #define SetTypeDifferentShading 8
 
+#define MaxNumberOfSuit 3
+
 @implementation SetCard
 
 @synthesize suit = _suit;
@@ -57,7 +59,7 @@
 
 +(int)maxNumOfSuits
 {
-    return 3;
+    return MaxNumberOfSuit;
 }
 
 +(NSArray*)validColors
@@ -72,9 +74,9 @@
 
 -(NSString *)contents
 {
-    NSMutableString *cardMutableString = [[NSMutableString alloc] initWithString:@" "];
+    NSMutableString *cardMutableString = [[NSMutableString alloc] initWithString:@""];
     for(int i = 1; i <= self.numOfSuit; i++)
-        [cardMutableString appendString:[NSString stringWithFormat:@"%@ ", self.suit]];
+        [cardMutableString appendString:[NSString stringWithFormat:@"%@", self.suit]];
     
     NSString *cardString = [cardMutableString copy];
     return cardString;
@@ -83,56 +85,15 @@
 -(int)match:(NSArray *)otherCards
 {
     int score = 0;
-    
     //Among all four: suit, number of suit, color and shading. Each of them is either all matched
     //or none matched.
-    if(([self matchSuit:otherCards] || [self matchDifferentSuit:otherCards]) &&
-       ([self matchNumOfSuit:otherCards] || [self matchDifferentNumofSuit:otherCards]) &&
-       ([self matchColor:otherCards] || [self matchDifferentColor:otherCards]) &&
-       ([self matchShading:otherCards] || [self matchDifferentShading:otherCards]))
+    if(([self matchASet:SetTypeSuit withCards:otherCards] || [self matchASet:SetTypeDifferentSuit withCards:otherCards]) &&
+       ([self matchASet:SetTypeNumOfSuit withCards:otherCards] || [self matchASet:SetTypeDifferentNumOfSuit withCards:otherCards]) &&
+       ([self matchASet:SetTypeColor withCards:otherCards] || [self matchASet:SetTypeDifferentColor withCards:otherCards]) &&
+       ([self matchASet:SetTypeShading withCards:otherCards] || [self matchASet:SetTypeDifferentShading withCards:otherCards]))
         score = 1;
     
     return score;
-}
-
--(BOOL)matchSuit:(NSArray*)otherCards
-{
-    return [self matchASet:SetTypeSuit withCards:otherCards];
-}
-
--(BOOL)matchNumOfSuit:(NSArray*)otherCards
-{
-    return [self matchASet:SetTypeNumOfSuit withCards:otherCards];
-}
-
--(BOOL)matchColor:(NSArray*)otherCards
-{
-    return [self matchASet:SetTypeColor withCards:otherCards];
-}
-
--(BOOL)matchShading:(NSArray*)otherCards
-{
-    return [self matchASet:SetTypeShading withCards:otherCards];
-}
-
--(BOOL)matchDifferentSuit:(NSArray*)otherCards
-{
-    return [self matchASet:SetTypeDifferentSuit withCards:otherCards];
-}
-
--(BOOL)matchDifferentNumofSuit:(NSArray*)otherCards
-{
-    return [self matchASet:SetTypeDifferentNumOfSuit withCards:otherCards];
-}
-
--(BOOL)matchDifferentColor:(NSArray*)otherCards
-{
-    return [self matchASet:SetTypeDifferentColor withCards:otherCards];
-}
-
--(BOOL)matchDifferentShading:(NSArray*)otherCards
-{
-    return [self matchASet:SetTypeDifferentShading withCards:otherCards];
 }
 
 -(BOOL)matchASet:(int)type withCards:(NSArray*)otherCards

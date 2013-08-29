@@ -13,7 +13,7 @@
 @interface CardSetGame : NSObject
 
 @property (readonly, nonatomic) int score;
-@property (readonly, nonatomic, strong) NSString *lastFlipResultString;
+@property (readonly, nonatomic, strong) NSDictionary *lastFlipResultDictionary;
 
 //designated initializer
 -(id)initWithCardCount:(NSUInteger)count

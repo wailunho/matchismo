@@ -13,7 +13,7 @@
 @interface CardSetGame()
 @property (strong, nonatomic) NSMutableArray *cards;
 @property (readwrite, nonatomic) int score;
-@property (readwrite, nonatomic, strong) NSString *lastFlipResultString;
+@property (readwrite, nonatomic, strong) NSDictionary *lastFlipResultDictionary;
 @end
 
 @implementation CardSetGame
@@ -43,7 +43,7 @@
             //set the lastFlipResultString to nil so we can check if it has change during
             //matches, and if it is not, we can assign a message to it only when we are not
             //doing the matches. In other words, this is the first or the second card selected.
-            self.lastFlipResultString = nil;
+            self.lastFlipResultDictionary = nil;
             
             //find another card(second card) that is already selected to do the matching
             for(SetCard *secondCard in self.cards)
@@ -66,7 +66,8 @@
                                 secondCard.unplayable = YES;
                                 thirdCard.unplayable = YES;
                                 self.score += matchScore * MATCH_BONUS;
-                                self.lastFlipResultString = [NSString stringWithFormat:@"Matched %@, %@ and %@ for %d points!", card.contents, secondCard.contents, thirdCard.contents, matchScore * MATCH_BONUS];
+                                NSString *tempString = [NSString stringWithFormat:@"Matched %@ , %@ and %@ for %d points!", card.contents, secondCard.contents, thirdCard.contents, matchScore * MATCH_BONUS];
+                                self.lastFlipResultDictionary = @{@"string": tempString, @"firstCard": card, @"secondCard": secondCard, @"thirdCard": thirdCard};
                             }
                             //not matched
                             else
@@ -75,7 +76,8 @@
                                 secondCard.isSelected = NO;
                                 thirdCard.isSelected = NO;
                                 self.score -= MISMATCH_PENALTY;
-                                self.lastFlipResultString = [NSString stringWithFormat:@"%@, %@ and %@ don't match! 4 points penality!", card.contents, secondCard.contents, thirdCard.contents];
+                                NSString *tempString = [NSString stringWithFormat:@"%@ , %@ and %@ don't match! %d points penality!", card.contents, secondCard.contents, thirdCard.contents, MISMATCH_PENALTY];
+                                self.lastFlipResultDictionary = @{@"string": tempString, @"firstCard":card, @"secondCard": secondCard, @"thirdCard": thirdCard};
                             }
                             break;
                         }
@@ -86,11 +88,17 @@
             self.score -= FLIP_COST;
             //if we try to match, lastFlipResultString should have something in it. If not,
             //we assign a message to tell the playing which card he or she flipped.
-            if(!self.lastFlipResultString)
-                self.lastFlipResultString = [NSString stringWithFormat:@"Selected %@", card.contents];
+            if(!self.lastFlipResultDictionary)
+            {
+                NSString *tempString = [NSString stringWithFormat:@"Selected %@", card.contents];
+                self.lastFlipResultDictionary = @{@"string": tempString, @"firstCard":card};
+            }
         }
         else
-            self.lastFlipResultString = [NSString stringWithFormat:@"Unselected %@", card.contents];
+        {
+            NSString *tempString = [NSString stringWithFormat:@"Unselected %@", card.contents];
+            self.lastFlipResultDictionary = @{@"string": tempString, @"firstCard":card};
+        }
         card.isSelected = !card.isSelected;
     }
 
