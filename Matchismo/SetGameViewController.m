@@ -9,6 +9,7 @@
 #import "SetGameViewController.h"
 #import "CardSetGame.h"
 #import "SetCardDeck.h"
+#import "SetGameResult.h"
 
 @interface SetGameViewController ()
 @property (strong, nonatomic) IBOutletCollection(UIButton) NSArray *cardButtons;
@@ -19,10 +20,17 @@
 @property (weak, nonatomic) IBOutlet UILabel *scoreLabel;
 @property (weak, nonatomic) IBOutlet UISlider *flipHistorySlider;
 @property (strong,nonatomic) NSMutableArray *flipHistory;
+@property (strong, nonatomic) SetGameResult *gameResult;
 
 @end
 
 @implementation SetGameViewController
+
+-(MatchGameResult*)gameResult
+{
+    if(!_gameResult)_gameResult = [[SetGameResult alloc] init];
+    return _gameResult;
+}
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -50,6 +58,7 @@
 - (IBAction)restartGame:(id)sender
 {
     self.flipCount = 0;
+    self.gameResult= nil;
     self.game = nil;
     self.lastFlipLabel.text = @"";
     self.flipHistorySlider.value = 0;
@@ -68,6 +77,7 @@
 {
     _flipCount = flipCount;
     self.flipLabel.text = [NSString stringWithFormat:@"Flips: %d", flipCount];
+    self.gameResult.score = self.game.score;
 }
 - (IBAction)browserHistory:(id)sender
 {

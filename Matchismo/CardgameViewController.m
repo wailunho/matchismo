@@ -9,6 +9,7 @@
 #import "CardgameViewController.h"
 #import "PlayingCardDeck.h"
 #import "CardMatchingGame.h"
+#import "MatchGameResult.h"
 
 @interface CardgameViewController ()
 
@@ -20,10 +21,17 @@
 @property (weak, nonatomic) IBOutlet UILabel *lastFlipLabel;
 @property (weak, nonatomic) IBOutlet UISlider *flipHistorySlider;
 @property (strong, nonatomic) NSMutableArray *flipHistory;
+@property (strong, nonatomic) MatchGameResult *gameResult;
 
 @end
 
 @implementation CardgameViewController
+
+-(MatchGameResult*)gameResult
+{
+    if(!_gameResult)_gameResult = [[MatchGameResult alloc] init];
+    return _gameResult;
+}
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -43,6 +51,7 @@
 
 - (IBAction)restartGame:(id)sender {
     self.game = nil;
+    self.gameResult = nil;
     self.flipHistory = nil;
     self.flipCount = 0;
     self.lastFlipLabel.text = @"";
@@ -105,6 +114,7 @@
 {
     _flipCount = flipCount;
     self.flipLabel.text = [NSString stringWithFormat:@"Flips: %d", flipCount];
+    self.gameResult.score = self.game.score;
 }
 
 - (IBAction)flipCard:(UIButton *)sender
