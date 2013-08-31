@@ -27,13 +27,24 @@
     return self;
 }
 
+-(void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    [self updateUI];
+}
+
+#pragma mark - Main functions
+
 -(void)updateUI
 {
+    //Setting up the date formatter
     NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
     [formatter setDateStyle:NSDateFormatterShortStyle];
     [formatter setTimeStyle:NSDateFormatterShortStyle];
     
     NSString *displayText = @"";
+    
+    //display match game ranking
     int i = 1;
     for(MatchGameResult *result in [[MatchGameResult allMatchGameResults] sortedArrayUsingSelector:@selector(compareScoreToGameResult:)])
     {
@@ -42,6 +53,7 @@
     }
     self.display.text = displayText;
     
+    //display set game ranking
     NSString *displaySetText = @"";
     i = 1;
     for(SetGameResult *result in [[SetGameResult allSetGameResults] sortedArrayUsingSelector:@selector(compareScoreToGameResult:)])
@@ -50,24 +62,6 @@
         i++;
     }
     self.displaySet.text = displaySetText;
-}
-
--(void)viewWillAppear:(BOOL)animated
-{
-    [super viewWillAppear:animated];
-    [self updateUI];
-}
-
-- (void)viewDidLoad
-{
-    [super viewDidLoad];
-	// Do any additional setup after loading the view.
-}
-
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
 }
 
 @end

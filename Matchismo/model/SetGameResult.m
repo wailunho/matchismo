@@ -7,7 +7,6 @@
 //
 
 #import "SetGameResult.h"
-#import "MatchGameResult.h"
 
 @implementation SetGameResult
 
@@ -15,22 +14,12 @@
 
 +(NSArray*) allSetGameResults
 {
-    NSMutableArray *allGameResults = [[NSMutableArray alloc] init];
-    for(id plist in [[[NSUserDefaults standardUserDefaults] dictionaryForKey:SET_RESULTS_KEY] allValues])
-    {
-        MatchGameResult *result = [[MatchGameResult alloc] initFromPropertyList:plist];
-        [allGameResults addObject:result];
-    }
-    return allGameResults;
+    return [self allGameResultsWithKey:SET_RESULTS_KEY];
 }
 
 -(void)synchronize
 {
-    NSMutableDictionary *mutableMatchGameResultsFromUserDefaults = [[[NSUserDefaults standardUserDefaults] dictionaryForKey:SET_RESULTS_KEY] mutableCopy];
-    if(!mutableMatchGameResultsFromUserDefaults)
-        mutableMatchGameResultsFromUserDefaults = [[NSMutableDictionary alloc] init];
-    mutableMatchGameResultsFromUserDefaults[[self.start description]] = [self asPropertyList];
-    [[NSUserDefaults standardUserDefaults] setObject:mutableMatchGameResultsFromUserDefaults forKey:SET_RESULTS_KEY];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self synchronizeWithKey:SET_RESULTS_KEY];
 }
+
 @end

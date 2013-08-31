@@ -27,11 +27,8 @@
 
 @implementation CardgameViewController
 
--(MatchGameResult*)gameResult
-{
-    if(!_gameResult)_gameResult = [[MatchGameResult alloc] init];
-    return _gameResult;
-}
+#define ALPHA_UNPLAYABLE 0.4
+#define ALPHA_PLAYABLE 1.0
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -42,22 +39,18 @@
     return self;
 }
 
+#pragma mark - Init
+
+-(MatchGameResult*)gameResult
+{
+    if(!_gameResult)_gameResult = [[MatchGameResult alloc] init];
+    return _gameResult;
+}
+
 -(NSMutableArray*)flipHistory
 {
     if(!_flipHistory)_flipHistory = [[NSMutableArray alloc] init];
     return _flipHistory;
-}
-
-
-- (IBAction)restartGame:(id)sender {
-    self.game = nil;
-    self.gameResult = nil;
-    self.flipHistory = nil;
-    self.flipCount = 0;
-    self.lastFlipLabel.text = @"";
-    self.flipHistorySlider.value = 0;
-    self.flipHistorySlider.maximumValue = 0;
-    [self updateUI];
 }
 
 -(CardMatchingGame *)game
@@ -67,16 +60,31 @@
     return _game;
 }
 
+#pragma mark - Setters
+
 -(void)setCardButtons:(NSArray *)cardButtons
 {
     _cardButtons = cardButtons;
     [self updateUI];
 }
 
-- (IBAction)browserFlipHistory:(id)sender
+-(void)setFlipCount:(int)flipCount
 {
-    [self updateUI];
+    _flipCount = flipCount;
+    self.flipLabel.text = [NSString stringWithFormat:@"Flips: %d", flipCount];
+    self.gameResult.score = self.game.score;
+    [self.gameResult synchronize];
 }
+
+#pragma mark - Helper
+
+//Use this to get the value in the slider in int, that is rounded off.
+-(int) historyIndex
+{
+    return (int)roundf(self.flipHistorySlider.value);
+}
+
+#pragma mark - main functions
 
 -(void) updateUI
 {
@@ -89,7 +97,7 @@
         [carButton setBackgroundImage:[UIImage imageNamed:@"cardSelected.png"] forState:UIControlStateSelected | UIControlStateDisabled];
         [carButton setBackgroundImage:[UIImage imageNamed:@"cardSelected.png"] forState:UIControlStateSelected];
         [carButton setBackgroundImage:[UIImage imageNamed:@"card.png"] forState:UIControlStateNormal];
-        carButton.alpha = (card.unplayable)? 0.4 : 1.0;
+        carButton.alpha = (card.unplayable)? ALPHA_UNPLAYABLE : ALPHA_PLAYABLE;
         carButton.selected = card.isFaceUp;
         carButton.enabled = !card.isUnplayable;
     }
@@ -101,20 +109,6 @@
     if(self.flipCount > 0)
         self.lastFlipLabel.text = [NSString stringWithFormat:@"%d: %@", [self historyIndex] + 1,self.flipHistory[[self historyIndex]]];
     
-}
-
-//Use this to get the value in the slider in int, that is rounded off.
--(int) historyIndex
-{
-    return (int)roundf(self.flipHistorySlider.value);
-}
-
-
--(void)setFlipCount:(int)flipCount
-{
-    _flipCount = flipCount;
-    self.flipLabel.text = [NSString stringWithFormat:@"Flips: %d", flipCount];
-    self.gameResult.score = self.game.score;
 }
 
 - (IBAction)flipCard:(UIButton *)sender
@@ -134,6 +128,23 @@
     
     //put the slider to reflect the most recent flip in the flip history
     self.flipHistorySlider.value = self.flipHistory.count - 1;
+    [self updateUI];
+}
+
+- (IBAction)restartGame:(id)sender {
+    self.game = nil;
+    self.gameResult = nil;
+    self.flipHistory = nil;
+    self.flipCount = 0;
+    self.lastFlipLabel.text = @"";
+    self.flipHistorySlider.value = 0;
+    self.flipHistorySlider.maximumValue = 0;
+    [self updateUI];
+}
+
+
+- (IBAction)browseHistory:(id)sender
+{
     [self updateUI];
 }
 

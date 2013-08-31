@@ -292,7 +292,7 @@
                                 <rect key="frame" x="22" y="354" width="277" height="23"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <connections>
-                                    <action selector="browserFlipHistory:" destination="2" eventType="valueChanged" id="FRM-Fo-6aM"/>
+                                    <action selector="browseHistory:" destination="2" eventType="valueChanged" id="Iwp-9y-PxD"/>
                                 </connections>
                             </slider>
                         </subviews>
@@ -362,7 +362,7 @@
                                 <fontDescription key="fontDescription" type="system" pointSize="13"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" text="textview2" id="dVx-le-UjJ">
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" text="textview2" id="dVx-le-UjJ">
                                 <rect key="frame" x="0.0" y="239" width="320" height="171"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
@@ -836,7 +836,7 @@
                                 <rect key="frame" x="25" y="350" width="277" height="23"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <connections>
-                                    <action selector="browserHistory:" destination="bHC-Mt-SzY" eventType="valueChanged" id="LLi-MS-yZB"/>
+                                    <action selector="browseHistory:" destination="bHC-Mt-SzY" eventType="valueChanged" id="Itj-MQ-r9X"/>
                                 </connections>
                             </slider>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Label" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="v1v-ql-bAD">
@@ -896,9 +896,6 @@
         <class className="CardgameViewController" superclassName="UIViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/CardgameViewController.h"/>
             <relationships>
-                <relationship kind="action" name="browserFlipHistory:"/>
-                <relationship kind="action" name="flipCard:" candidateClass="UIButton"/>
-                <relationship kind="action" name="restartGame:"/>
                 <relationship kind="outlet" name="flipHistorySlider" candidateClass="UISlider"/>
                 <relationship kind="outlet" name="flipLabel" candidateClass="UILabel"/>
                 <relationship kind="outlet" name="lastFlipLabel" candidateClass="UILabel"/>
@@ -916,9 +913,6 @@
         <class className="SetGameViewController" superclassName="UIViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/SetGameViewController.h"/>
             <relationships>
-                <relationship kind="action" name="browserHistory:"/>
-                <relationship kind="action" name="restartGame:"/>
-                <relationship kind="action" name="selectCard:"/>
                 <relationship kind="outlet" name="flipHistorySlider" candidateClass="UISlider"/>
                 <relationship kind="outlet" name="flipLabel" candidateClass="UILabel"/>
                 <relationship kind="outlet" name="lastFlipLabel" candidateClass="UILabel"/>
@@ -928,9 +922,6 @@
         </class>
         <class className="SettingViewController" superclassName="UIViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/SettingViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="resetRanking:"/>
-            </relationships>
         </class>
     </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">

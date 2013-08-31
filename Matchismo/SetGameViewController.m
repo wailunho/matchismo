@@ -26,11 +26,12 @@
 
 @implementation SetGameViewController
 
--(MatchGameResult*)gameResult
-{
-    if(!_gameResult)_gameResult = [[SetGameResult alloc] init];
-    return _gameResult;
-}
+#define ALPHA_UNPLAYABLE 0.1
+#define ALPHA_PLAYABLE 1.0
+#define REDKEY @"redColor"
+#define GREENKEY @"greenColor"
+#define BLUEKEY @"blueColor"
+#define STROKEWIDTH @-5
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -41,12 +42,7 @@
     return self;
 }
 
-
--(NSMutableArray*)flipHistory
-{
-    if(!_flipHistory)_flipHistory = [[NSMutableArray alloc] init];
-    return _flipHistory;
-}
+#pragma mark - Init
 
 - (void)viewDidLoad
 {
@@ -55,17 +51,26 @@
     self.lastFlipLabel.text = @"";
 }
 
-- (IBAction)restartGame:(id)sender
+-(GameResult*)gameResult
 {
-    self.flipCount = 0;
-    self.gameResult= nil;
-    self.game = nil;
-    self.lastFlipLabel.text = @"";
-    self.flipHistorySlider.value = 0;
-    self.flipHistorySlider.maximumValue = 0;
-    self.flipHistory = nil;
-    [self updateUI];
+    if(!_gameResult)_gameResult = [[SetGameResult alloc] init];
+    return _gameResult;
 }
+
+-(NSMutableArray*)flipHistory
+{
+    if(!_flipHistory)_flipHistory = [[NSMutableArray alloc] init];
+    return _flipHistory;
+}
+
+-(CardSetGame *)game
+{
+    if(!_game)_game = [[CardSetGame alloc] initWithCardCount:[self.cardButtons count]
+                                                   usingDeck:[[SetCardDeck alloc] init]];
+    return _game;
+}
+
+#pragma mark - Setters
 
 -(void)setCardButtons:(NSArray *)cardButtons
 {
@@ -78,11 +83,38 @@
     _flipCount = flipCount;
     self.flipLabel.text = [NSString stringWithFormat:@"Flips: %d", flipCount];
     self.gameResult.score = self.game.score;
+    [self.gameResult synchronize];
 }
-- (IBAction)browserHistory:(id)sender
+
+#pragma mark - Helpers
+
+//Use this to get the value in the slider in int, that is rounded off.
+-(int) historyIndex
 {
-    [self updateUI];
+    return (int)roundf(self.flipHistorySlider.value);
 }
+
+//convert a Card contents into attributed string
+-(NSAttributedString*)contentToAttributedString:(SetCard*)card
+{
+    NSDictionary *colorDictionary = @{REDKEY:[UIColor redColor], GREENKEY: [UIColor greenColor], BLUEKEY: [UIColor blueColor]};
+    
+    NSDictionary *attributes = @{NSStrokeColorAttributeName: colorDictionary[card.color], NSForegroundColorAttributeName: [colorDictionary[card.color] colorWithAlphaComponent:[card.shading floatValue]], NSStrokeWidthAttributeName: STROKEWIDTH};
+    
+    NSAttributedString *attributedString = [[NSAttributedString alloc] initWithString:card.contents attributes:attributes];
+    return attributedString;
+}
+
+//replace a word in an attributed string with another word
+//can be use to replace an attributed word with the same word with another attributes.
+-(NSMutableAttributedString*) replaceWordInString:(NSMutableAttributedString*) attributedString withWord: (NSAttributedString*) word
+{
+    NSRange range = [[attributedString string] rangeOfString: [word string]];
+    [attributedString replaceCharactersInRange:range withAttributedString:word];
+    return attributedString;
+}
+
+#pragma mark - Main functions
 
 -(void) updateUI
 {
@@ -95,9 +127,9 @@
         [cardButton setAttributedTitle: cardAttributedString forState:UIControlStateNormal];
         
         cardButton.enabled = !card.isUnplayable;
-        cardButton.selected = card.isSelected;
-        cardButton.alpha = (card.isUnplayable)? 0.1 : 1.0;
-        if(card.isSelected)
+        cardButton.selected = card.isFaceUp;
+        cardButton.alpha = (card.isUnplayable)? ALPHA_UNPLAYABLE : ALPHA_PLAYABLE;
+        if(card.isFaceUp)
             cardButton.backgroundColor = [UIColor yellowColor];
         else
             cardButton.backgroundColor = [UIColor whiteColor];
@@ -113,36 +145,6 @@
         [temp appendAttributedString:self.flipHistory[[self historyIndex]]];
         self.lastFlipLabel.attributedText = temp;
     }
-}
-
-//Use this to get the value in the slider in int, that is rounded off.
--(int) historyIndex
-{
-    return (int)roundf(self.flipHistorySlider.value);
-}
-
--(CardSetGame *)game
-{
-    if(!_game)_game = [[CardSetGame alloc] initWithCardCount:[self.cardButtons count]
-                                                   usingDeck:[[SetCardDeck alloc] init]];
-    return _game;
-}
-
--(NSAttributedString*)contentToAttributedString:(SetCard*)card
-{
-    NSDictionary *colorDictionary = @{@"redColor":[UIColor redColor], @"greenColor": [UIColor greenColor], @"blueColor": [UIColor blueColor]};
-    
-    NSDictionary *attributes = @{NSStrokeColorAttributeName: colorDictionary[card.color], NSForegroundColorAttributeName: [colorDictionary[card.color] colorWithAlphaComponent:[card.shading floatValue]], NSStrokeWidthAttributeName: @-5};
-    
-    NSAttributedString *attributedString = [[NSAttributedString alloc] initWithString:card.contents attributes:attributes];
-    return attributedString;
-}
-
--(NSMutableAttributedString*) replaceWordInString:(NSMutableAttributedString*) attributedString withWord: (NSAttributedString*) word
-{
-    NSRange range = [[attributedString string] rangeOfString: [word string]];
-    [attributedString replaceCharactersInRange:range withAttributedString:word];
-    return attributedString;
 }
 
 - (IBAction)selectCard:(id)sender
@@ -169,24 +171,29 @@
             [replacingWords addObjectsFromArray:@[[self contentToAttributedString:secondCard], [self contentToAttributedString:thirdCard]]];
         }
         
+        //putting the history string into an array
         NSArray *stringArray = [self.game.lastFlipResultDictionary[@"string"] componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
         for(NSString* word in stringArray)
         {
+            //matching each words that need to replace with the word in history string
             for(int i = 0; i <= [wordsNeedToReplace count]; i++)
             {
+                //none matched
                 if(i == [wordsNeedToReplace count])
                     [historyAttributedString appendAttributedString:[[NSAttributedString alloc] initWithString:[word stringByAppendingString:@" "]]];
+                //a word matched
                 else if([wordsNeedToReplace[i] isEqualToString:word])
                 {
                     [historyAttributedString appendAttributedString:replacingWords[i]];
                     [historyAttributedString appendAttributedString:[[NSAttributedString alloc] initWithString:@" "]];
+                    //remove the word from the list
                     wordsNeedToReplace[i] = @"";
                     break;
                 }
             }
         }
         
-        
+        //add to the array and set the max value of the slider
         [self.flipHistory addObject:historyAttributedString];
         self.flipHistorySlider.maximumValue = self.flipCount - 1;
     }
@@ -194,6 +201,23 @@
     //put the slider to reflect the most recent flip in the flip history
     self.flipHistorySlider.value = self.flipHistory.count - 1;
     
+    [self updateUI];
+}
+
+- (IBAction)restartGame:(id)sender
+{
+    self.flipCount = 0;
+    self.gameResult= nil;
+    self.game = nil;
+    self.lastFlipLabel.text = @"";
+    self.flipHistorySlider.value = 0;
+    self.flipHistorySlider.maximumValue = 0;
+    self.flipHistory = nil;
+    [self updateUI];
+}
+
+- (IBAction)browseHistory:(id)sender
+{
     [self updateUI];
 }
 

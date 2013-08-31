@@ -6,22 +6,10 @@
 //  Copyright (c) 2013 William Ho. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
-#import "Card.h"
-#import "Deck.h"
+#import "CardGame.h"
 
-@interface CardMatchingGame : NSObject
+@interface CardMatchingGame : CardGame
 
 @property (readonly, nonatomic, strong) NSString *lastFlipResultString;
-@property (readonly, nonatomic) int score;
-
-//designated initializer
--(id)initWithCardCount:(NSUInteger)count
-             usingDeck:(Deck*) deck;
-
--(void)flipCardAtIndex:(NSUInteger) index;
--(Card*)cardAtIndex:(NSUInteger)index;
-
-
 
 @end

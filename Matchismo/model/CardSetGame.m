@@ -12,7 +12,6 @@
 
 @interface CardSetGame()
 @property (strong, nonatomic) NSMutableArray *cards;
-@property (readwrite, nonatomic) int score;
 @property (readwrite, nonatomic, strong) NSDictionary *lastFlipResultDictionary;
 @end
 
@@ -22,22 +21,28 @@
 #define MATCH_BONUS 8
 #define MISMATCH_PENALTY 4
 #define FLIP_COST 1
+#define STRINGKEY @"string"
+#define FIRSTCARDKEY @"firstCard"
+#define SECONDCARDKEY @"secondCard"
+#define THIRDCARDKEY @"thirdCard"
 
--(NSMutableArray*)cards
+-(NSDictionary*)convertToDictionaryFromString:(NSString*)string
+                                    firstCard:(Card*)firstCard
+                                   secondCard:(Card*)secondCard
+                                    thirdCard:(Card*)thirdCard
 {
-    if(!_cards)_cards = [[NSMutableArray alloc] init];
-    return _cards;
+    return @{STRINGKEY: string, FIRSTCARDKEY: firstCard, SECONDCARDKEY: secondCard, THIRDCARDKEY: thirdCard};
 }
 
 -(void)flipCardAtIndex:(NSUInteger) index
 {
-    SetCard *card = [self cardAtIndex:index];
+    Card *card = [self cardAtIndex:index];
     
     //check if card choosen and is playable
     if(card && !card.isUnplayable)
     {
         //check if card is not selected
-        if(!card.isSelected)
+        if(!card.isFaceUp)
         {
             //at this point, we have selected a card.
             //set the lastFlipResultString to nil so we can check if it has change during
@@ -48,13 +53,13 @@
             //find another card(second card) that is already selected to do the matching
             for(SetCard *secondCard in self.cards)
             {
-                if(secondCard.isSelected && !secondCard.isUnplayable)
+                if(secondCard.isFaceUp && !secondCard.isUnplayable)
                 {
                     //second card is selected, we need to once again find another card that is selected.
                     for(SetCard *thirdCard in self.cards)
                     {
                         
-                        if(thirdCard != secondCard && thirdCard.isSelected && !thirdCard.isUnplayable)
+                        if(thirdCard != secondCard && thirdCard.isFaceUp && !thirdCard.isUnplayable)
                         {
                             //three cards are selected
                             //match these three card.
@@ -67,17 +72,17 @@
                                 thirdCard.unplayable = YES;
                                 self.score += matchScore * MATCH_BONUS;
                                 NSString *tempString = [NSString stringWithFormat:@"Matched %@ , %@ and %@ for %d points!", card.contents, secondCard.contents, thirdCard.contents, matchScore * MATCH_BONUS];
-                                self.lastFlipResultDictionary = @{@"string": tempString, @"firstCard": card, @"secondCard": secondCard, @"thirdCard": thirdCard};
+                                self.lastFlipResultDictionary = [self convertToDictionaryFromString:tempString firstCard:card secondCard:secondCard thirdCard:thirdCard];
                             }
                             //not matched
                             else
                             {
-                                card.isSelected = YES;
-                                secondCard.isSelected = NO;
-                                thirdCard.isSelected = NO;
+                                card.FaceUp = YES;
+                                secondCard.FaceUp = NO;
+                                thirdCard.FaceUp = NO;
                                 self.score -= MISMATCH_PENALTY;
                                 NSString *tempString = [NSString stringWithFormat:@"%@ , %@ and %@ don't match! %d points penality!", card.contents, secondCard.contents, thirdCard.contents, MISMATCH_PENALTY];
-                                self.lastFlipResultDictionary = @{@"string": tempString, @"firstCard":card, @"secondCard": secondCard, @"thirdCard": thirdCard};
+                                self.lastFlipResultDictionary = [self convertToDictionaryFromString:tempString firstCard:card secondCard:secondCard thirdCard:thirdCard];
                             }
                             break;
                         }
@@ -91,45 +96,16 @@
             if(!self.lastFlipResultDictionary)
             {
                 NSString *tempString = [NSString stringWithFormat:@"Selected %@", card.contents];
-                self.lastFlipResultDictionary = @{@"string": tempString, @"firstCard":card};
+                self.lastFlipResultDictionary = [self convertToDictionaryFromString:tempString firstCard:card secondCard:card thirdCard:card];
             }
         }
         else
         {
             NSString *tempString = [NSString stringWithFormat:@"Unselected %@", card.contents];
-            self.lastFlipResultDictionary = @{@"string": tempString, @"firstCard":card};
+            self.lastFlipResultDictionary = [self convertToDictionaryFromString:tempString firstCard:card secondCard:card thirdCard:card];
         }
-        card.isSelected = !card.isSelected;
+        card.faceUp = !card.isFaceUp;
     }
-
-}
-
-
--(id)initWithCardCount:(NSUInteger)count
-             usingDeck:(Deck*) deck;
-{
-    self = [super init];
-    if(self)
-    {
-        for(int i = 0; i < count; i++)
-        {
-            SetCard *card = [deck drawRandomCard];
-            if(card)
-                self.cards[i] = card;
-            else
-            {
-                self = nil;
-                break;
-            }
-        }
-    }
-    return self;
-}
-
--(SetCard*)cardAtIndex:(NSUInteger)index
-{
-    //return the card in index.
-    return (index < [self.cards count]) ? self.cards[index] : nil;
 }
 
 @end

@@ -18,6 +18,9 @@
 #define SetTypeDifferentShading 8
 
 #define MaxNumberOfSuit 3
+#define ShadingValueLow @0.0
+#define ShadingValueMid @0.2
+#define ShadingValueHigh @1.0
 
 @implementation SetCard
 
@@ -69,7 +72,7 @@
 
 +(NSArray*)validShadings
 {
-    return @[@0.0, @0.2, @1.0];
+    return @[ShadingValueLow, ShadingValueMid, ShadingValueHigh];
 }
 
 -(NSString *)contents

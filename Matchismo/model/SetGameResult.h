@@ -6,10 +6,11 @@
 //  Copyright (c) 2013 William Ho. All rights reserved.
 //
 
-#import "MatchGameResult.h"
+#import "GameResult.h"
 
-@interface SetGameResult : MatchGameResult
+@interface SetGameResult : GameResult
 
 +(NSArray*) allSetGameResults;
+-(void)synchronize;
 
 @end

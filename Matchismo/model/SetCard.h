@@ -14,8 +14,6 @@
 @property(nonatomic) int numOfSuit;
 @property(strong, nonatomic) NSString *color;
 @property(strong, nonatomic) NSNumber *shading;
-@property (strong, nonatomic) NSString *contents;
-@property (nonatomic) BOOL isSelected;
 
 +(NSArray*)validSuits;
 +(NSArray*)validColors;

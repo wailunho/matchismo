@@ -6,18 +6,11 @@
 //  Copyright (c) 2013 William Ho. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
+#import "GameResult.h"
 
-@interface MatchGameResult : NSObject
-
-@property (readonly, nonatomic) NSDate *start;
-@property (readonly, nonatomic) NSDate *end;
-@property (readonly, nonatomic) NSTimeInterval duration;
-@property (nonatomic) int score;
+@interface MatchGameResult : GameResult
 
 +(NSArray*) allMatchGameResults;
-- (id)initFromPropertyList:(id)plist;
-- (id)asPropertyList;
-- (NSComparisonResult)compareScoreToGameResult:(MatchGameResult *)otherResult;
+-(void)synchronize;
 
 @end

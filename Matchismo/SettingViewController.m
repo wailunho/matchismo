@@ -27,6 +27,7 @@
 }
 - (IBAction)resetRanking:(id)sender
 {
+    //reset both ranking
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:SET_RESULTS_KEY];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:MATCH_RESULTS_KEY];
 }
